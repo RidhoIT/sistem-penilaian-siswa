@@ -56,7 +56,7 @@ export default function Header({ title, showHamburger, onHamburgerClick, breadcr
             </button>
           </div>
         )}
-        <button className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors">
+        {/* <button className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors">
           <Bell className="text-xl text-slate-500" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-zinc-900 rounded-full border-2 border-white" />
         </button>
@@ -66,7 +66,7 @@ export default function Header({ title, showHamburger, onHamburgerClick, breadcr
           width={32}
           height={32}
           className="w-8 h-8 rounded-full border border-slate-200 bg-slate-100"
-        />
+        /> */}
       </div>
     </header>
   );

@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { GraduationCap, Info, AlertTriangle, ArrowRight } from "lucide-react";
+import {
+  GraduationCap,
+  Info,
+  AlertTriangle,
+  ArrowRight,
+} from "lucide-react";
 
 export default function InstruksiUjianPage() {
   const [agreed, setAgreed] = useState(false);
@@ -19,119 +24,127 @@ export default function InstruksiUjianPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 md:p-12">
-      <div className="w-full max-w-[680px] space-y-6">
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-8 md:p-10 border-b border-slate-100 bg-slate-50/30">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center">
-                  <GraduationCap className="text-white text-2xl" />
-                </div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Instruksi Pengerjaan</span>
-              </div>
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+      <div className="w-full max-w-[440px] flex flex-col gap-5">
 
-              <h1 className="text-2xl md:text-3xl font-semibold text-zinc-900 tracking-tight leading-tight">
-                Ujian Akhir Semester Genap — Matematika Peminatan
-              </h1>
+        {/* Header */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-slate-200 flex items-center justify-center">
+            <GraduationCap className="text-zinc-800 w-7 h-7" />
+          </div>
+          <div className="text-center">
+            <h2 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+              Instruksi Pengerjaan
+            </h2>
+            <p className="text-[13px] font-semibold text-zinc-600">
+              SMA Negeri 1 Pekanbaru
+            </p>
+          </div>
+        </div>
 
-              <div className="flex flex-wrap gap-2 pt-2">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 text-zinc-700 border border-zinc-200">
-                  Kelas X IPA
-                </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 text-zinc-700 border border-zinc-200">
-                  40 Soal
-                </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 text-zinc-700 border border-zinc-200">
-                  90 Menit
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  Status: Berlangsung
-                </span>
-              </div>
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+
+          {/* Judul */}
+          <div className="p-5 border-b border-slate-50 bg-slate-50/30">
+            <h1 className="text-[16px] font-bold text-zinc-900 leading-tight">
+              Ujian Akhir Semester Genap — Matematika Peminatan
+            </h1>
+
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-zinc-600 border border-slate-200 shadow-sm">
+                KELAS X IPA
+              </span>
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-zinc-600 border border-slate-200 shadow-sm">
+                40 SOAL
+              </span>
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-zinc-600 border border-slate-200 shadow-sm">
+                90 MENIT
+              </span>
             </div>
           </div>
 
-          <div className="p-8 md:p-10 space-y-10">
-            <div className="space-y-4">
-              <h2 className="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-                <Info className="text-zinc-500 text-lg" />
-                Petunjuk Pengerjaan Ujian
+          {/* Content */}
+          <div className="p-5 space-y-6">
+
+            {/* Instructions */}
+            <div className="space-y-3">
+              <h2 className="text-[13px] font-bold text-zinc-900 flex items-center gap-2">
+                <Info className="w-4 h-4 text-slate-500" />
+                Petunjuk
               </h2>
-              <ul className="space-y-3">
+
+              <ul className="space-y-2">
                 {instructions.map((inst, i) => (
-                  <li key={i} className="relative pl-8 text-[13px] text-slate-600 leading-relaxed">
-                    <span className="absolute left-0 top-0 w-5 h-5 bg-zinc-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 text-[12px] text-slate-600"
+                  >
+                    <span className="min-w-[18px] h-[18px] bg-zinc-900 text-white text-[10px] rounded-full flex items-center justify-center">
                       {i + 1}
                     </span>
-                    {inst}
+                    <span>{inst}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="bg-red-50/50 border border-red-100 rounded-xl p-6 space-y-3">
-              <h3 className="text-[13px] font-semibold text-red-900 flex items-center gap-2">
-                <AlertTriangle className="text-red-600" />
-                Peringatan: Larangan Kecurangan & Plagiarism
+            {/* Warning */}
+            <div className="border border-red-100 bg-red-50/40 rounded-xl p-4 space-y-2">
+              <h3 className="text-[12px] font-bold text-red-700 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                Larangan
               </h3>
-              <div className="text-[12px] text-red-800/80 leading-relaxed space-y-2">
-                <p>Pengerjaan ujian ini diawasi oleh sistem monitoring otomatis. Sistem kami dapat mendeteksi:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Tab switching atau minimize window (akan dihitung sebagai pelanggaran)</li>
-                  <li>Copy-paste konten soal atau jawaban</li>
-                  <li>Penggunaan tools eksternal (kalkulator, search engine, ChatGPT, dll)</li>
-                  <li>Akses ke browser history atau bookmark</li>
-                  <li>Multiple submissions atau login dari device berbeda</li>
-                </ul>
-                <p className="font-medium pt-1">
-                  Setiap pelanggaran akan dicatat dan dapat mengakibatkan nilai ujian dibatalkan atau tindakan disiplin lebih lanjut sesuai kebijakan sekolah.
-                </p>
-              </div>
+              <ul className="text-[11px] text-red-700 space-y-1 list-disc pl-5">
+                <li>Tab switching / minimize window</li>
+                <li>Copy paste jawaban</li>
+                <li>Menggunakan tools eksternal</li>
+                <li>Login di device lain</li>
+              </ul>
+              <p className="text-[11px] text-red-700 font-medium">
+                Pelanggaran dapat menyebabkan ujian dibatalkan.
+              </p>
             </div>
 
-            <div className="pt-4 space-y-5">
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex items-center mt-0.5">
-                  <input
-                    type="checkbox"
-                    checked={agreed}
-                    onChange={(e) => setAgreed(e.target.checked)}
-                    className="peer h-5 w-5 appearance-none rounded border border-slate-300 bg-white checked:bg-zinc-900 checked:border-zinc-900 transition-all cursor-pointer"
-                  />
-                  <svg className="absolute text-white text-sm opacity-0 peer-checked:opacity-100 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                </div>
-                <span className="text-[12px] text-slate-500 group-hover:text-zinc-900 transition-colors select-none">
-                  Saya memahami dan setuju dengan petunjuk dan aturan di atas
+            {/* Agreement */}
+            <div className="space-y-4 pt-2 border-t border-slate-100">
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-zinc-900 cursor-pointer"
+                />
+                <span className="text-[12px] text-slate-500">
+                  Saya setuju dengan aturan ujian
                 </span>
               </label>
 
-              <div className="space-y-3">
-                <Link
-                  href="/siswa/ujian"
-                  className={`w-full h-12 bg-zinc-900 text-white font-semibold rounded-lg shadow-sm flex items-center justify-center gap-2 transition-all duration-300 hover:bg-zinc-800 ${
-                    !agreed ? "opacity-40 pointer-events-none" : ""
-                  }`}
-                >
-                  Mulai Ujian Sekarang
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <p className="text-center text-[11px] text-red-500 font-medium">
-                  Harap tutup semua aplikasi lain sebelum memulai. Jangan minimize atau ganti tab selama ujian berlangsung.
-                </p>
-              </div>
+              {/* Button */}
+              <Link
+                href="/siswa/ujian"
+                className={`w-full h-11 bg-zinc-900 text-white text-[13px] font-bold rounded-xl flex items-center justify-center gap-2 transition ${
+                  !agreed
+                    ? "opacity-40 pointer-events-none"
+                    : "hover:bg-zinc-800"
+                }`}
+              >
+                Mulai Ujian
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+
+              <p className="text-center text-[11px] text-red-500">
+                Jangan keluar dari halaman selama ujian
+              </p>
             </div>
+
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 font-medium">
-          Masalah teknis? <a href="#" className="text-slate-600 hover:text-zinc-900 underline underline-offset-4">Hubungi Pengawas Ujian</a>
+        <p className="text-center text-[11px] text-slate-400">
+          Butuh bantuan?{" "}
+          <a href="#" className="underline">
+            Hubungi Pengawas
+          </a>
         </p>
       </div>
     </div>

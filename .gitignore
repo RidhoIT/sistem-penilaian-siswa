@@ -1,0 +1,45 @@
+# ======================
+# GLOBAL
+# ======================
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# ======================
+# FRONTEND (Next.js)
+# ======================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# ======================
+# BACKEND (Next.js / API)
+# ======================
+backend/node_modules/
+backend/.next/
+
+# ======================
+# PRISMA
+# ======================
+prisma/*.db
+prisma/*.db-journal
+
+# ======================
+# LOGS
+# ======================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ======================
+# OS
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# TOOLS
+# ======================
+.claude/

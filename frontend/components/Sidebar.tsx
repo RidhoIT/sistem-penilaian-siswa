@@ -1,6 +1,6 @@
 "use client";
-
 import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -8,6 +8,8 @@ import {
   Users,
   GraduationCap,
   MoreVertical,
+  UserCircle,
+  LogOut,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -15,21 +17,36 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ role }: SidebarProps) {
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const isAdmin = role === "admin";
   const basePath = isAdmin ? "/admin" : "/guru";
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <aside className="w-[248px] min-h-screen bg-white border-r border-slate-200 flex flex-col">
+      {/* Logo */}
       <div className="h-14 flex items-center px-5 border-b border-slate-100 flex-shrink-0">
         <Link href={`${basePath}/dashboard`} className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center">
             <GraduationCap className="text-white text-lg" />
           </div>
-          <span className="font-bold text-zinc-900 text-[15px] tracking-tight">ExamHub</span>
+          <span className="font-bold text-zinc-900 text-[15px] tracking-tight">Sistem Penilaian</span>
         </Link>
       </div>
 
+      {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-5 px-3 space-y-1">
         <Link
           href={`${basePath}/dashboard`}
@@ -38,7 +55,6 @@ export default function Sidebar({ role }: SidebarProps) {
           <LayoutDashboard className="text-[18px] flex-shrink-0" />
           Dashboard
         </Link>
-
         <Link
           href={`${basePath}/mata-pelajaran`}
           className={`nav-link ${pathname.startsWith(`${basePath}/mata-pelajaran`) ? "active" : ""}`}
@@ -46,7 +62,6 @@ export default function Sidebar({ role }: SidebarProps) {
           <BookOpen className="text-[18px] flex-shrink-0" />
           Mata Pelajaran
         </Link>
-
         {isAdmin && (
           <Link
             href={`${basePath}/manajemen-user`}
@@ -58,17 +73,49 @@ export default function Sidebar({ role }: SidebarProps) {
         )}
       </div>
 
-      <div className="p-4 border-t border-slate-100 flex-shrink-0">
-        <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors">
+      {/* User Section */}
+      <div className="p-4 border-t border-slate-100 flex-shrink-0 relative" ref={menuRef}>
+
+        {/* Popup Menu — muncul di atas tombol, dengan padding yang cukup */}
+        {showMenu && (
+          <div className="absolute left-4 right-4 bottom-[76px] bg-white border border-slate-200 rounded-xl shadow-xl z-10 overflow-hidden">
+            <div className="p-1.5 space-y-0.5">
+              <Link
+                href="/profile"
+                onClick={() => setShowMenu(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-700 hover:bg-slate-50 transition-colors"
+              >
+                <UserCircle className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                Profile
+              </Link>
+              <Link
+                href="/profile/logout"
+                onClick={() => setShowMenu(false)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <LogOut className="w-4 h-4 flex-shrink-0" />
+                Logout
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* User Button */}
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-slate-50 transition-colors focus:outline-none"
+        >
           <div className="w-9 h-9 bg-zinc-900 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
             BS
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-left">
             <p className="text-[13px] font-semibold text-zinc-900 truncate">Budi Santosa</p>
-            <p className="text-[11px] text-slate-400 truncate">{isAdmin ? "Administrator" : "Guru Matematika"}</p>
+            <p className="text-[11px] text-slate-400 truncate">
+              {isAdmin ? "Administrator" : "Guru Matematika"}
+            </p>
           </div>
           <MoreVertical className="text-slate-400 text-base flex-shrink-0" />
-        </div>
+        </button>
       </div>
     </aside>
   );
