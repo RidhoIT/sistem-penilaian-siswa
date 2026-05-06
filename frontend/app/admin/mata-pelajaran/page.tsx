@@ -6006,20 +6006,40 @@ async function readTxtAsText(file: File): Promise<string> {
 
 // ─── Helper: call OpenRouter AI untuk parse soal ──────────────────────────────
 async function parseQuestionsWithAI(text: string): Promise<SoalItem[]> {
+  //   const systemPrompt = `Kamu adalah parser soal ujian profesional yang sangat teliti.
+  // Tugasmu adalah mengonversi SETIAP soal pilihan ganda dalam teks ke format JSON.
+
+  // Aturan WAJIB:
+  // 1. Output HANYA array JSON mentah. TIDAK ada markdown, TIDAK ada \`\`\`json, TIDAK ada teks lain.
+  // 2. Konversi SEMUA soal yang ada — jangan ada yang terlewat.
+  // 3. Field "jawaban" WAJIB berisi teks yang IDENTIK SAMA PERSIS dengan salah satu elemen di array "opsi".
+  //    - Salin teks opsi yang benar ke field "jawaban" kata per kata, huruf per huruf.
+  //    - Contoh: jika opsi = ["Rp70.000", "Rp80.000", "Rp90.000", "Rp100.000"] dan jawaban benar adalah opsi kedua, maka "jawaban": "Rp80.000"
+  //    - Contoh: jika opsi = ["1 dan 2", "2 dan 3", "3 dan 4", "1 dan 4"] dan jawaban benar opsi kedua, maka "jawaban": "2 dan 3"
+  //    - DILARANG menulis jawaban yang berbeda huruf besar/kecil, spasi, atau ejaan dari teks opsi.
+  //    - DILARANG mengosongkan jawaban jika soal pilihan ganda — harus selalu ada.
+  // 4. Verifikasi sebelum output: pastikan nilai "jawaban" === salah satu nilai di array "opsi". Jika tidak sama, perbaiki.
+  // 5. Jika soal TIDAK memiliki opsi jawaban sama sekali, BUAT 4-5 opsi yang masuk akal berdasarkan konteks soal, lalu salin salah satunya ke "jawaban".
+  // 6. Bersihkan semua notasi LaTeX menjadi teks biasa (misal: \\frac{a}{b} → a/b). Terapkan konsisten ke pertanyaan DAN semua opsi DAN jawaban.
+  // 7. Opsi bisa sampai 5 (A, B, C, D, E).
+  // 8. Hapus teks duplikat/repetisi dari pertanyaan dan opsi.`;
   const systemPrompt = `Kamu adalah parser soal ujian profesional yang sangat teliti.
 Tugasmu adalah mengonversi SETIAP soal pilihan ganda dalam teks ke format JSON.
 
 Aturan WAJIB:
 1. Output HANYA array JSON mentah. TIDAK ada markdown, TIDAK ada \`\`\`json, TIDAK ada teks lain.
 2. Konversi SEMUA soal yang ada — jangan ada yang terlewat.
-3. Field \"jawaban\" WAJIB berisi HURUF jawaban yang benar: A, B, C, D, atau E.\n" +
-"   - Jika ada kunci \"c. 97\", maka jawaban = \"C\"\n" +
-"   - Jika tidak ada kunci, tentukan sendiri huruf jawaban yang paling benar.\n" +
-"   - JANGAN isi dengan teks opsi, cukup hurufnya saja.
-4. Jika soal TIDAK memiliki opsi jawaban sama sekali, BUAT 4-5 opsi yang masuk akal berdasarkan konteks soal, dan tentukan jawaban yang benar.
-5. Bersihkan semua notasi LaTeX menjadi teks biasa (misal: \\frac{a}{b} → a/b).
-6. Opsi bisa sampai 5 (A, B, C, D, E).
-7. Hapus teks duplikat/repetisi dari pertanyaan dan opsi.`;
+3. Field "jawaban" WAJIB berisi HURUF opsi yang benar: "A", "B", "C", "D", atau "E".
+   - Tentukan huruf berdasarkan posisi dalam array "opsi".
+   - Contoh: jika jawaban benar adalah opsi pertama → "jawaban": "A"
+   - Contoh: jika jawaban benar adalah opsi ketiga → "jawaban": "C"
+   - DILARANG mengisi dengan teks opsi.
+4. Verifikasi sebelum output:
+   - Pastikan huruf jawaban sesuai dengan posisi opsi yang benar.
+5. Jika soal TIDAK memiliki opsi jawaban sama sekali, BUAT 4-5 opsi yang masuk akal berdasarkan konteks soal, lalu tentukan salah satunya sebagai jawaban dan isi dengan hurufnya.
+6. Bersihkan semua notasi LaTeX menjadi teks biasa (misal: \\frac{a}{b} → a/b). Terapkan konsisten ke pertanyaan DAN semua opsi.
+7. Opsi bisa sampai 5 (A, B, C, D, E).
+8. Hapus teks duplikat/repetisi dari pertanyaan dan opsi.`;
 
   const userPrompt = `Konversi SEMUA soal berikut ke dalam JSON array.
 
@@ -6029,7 +6049,7 @@ Format setiap elemen JSON:
   "pertanyaan": "<teks soal bersih tanpa LaTeX>",
   "tipe": "pg",
   "opsi": ["<teks opsi A bersih>", "<teks opsi B bersih>", "<teks opsi C bersih>", "<teks opsi D bersih>", "<teks opsi E bersih>"],
-  "jawaban": "<ISI teks jawaban benar yang bersih, bukan hurufnya>",
+  "jawaban": "<HURUF jawaban benar: A, B, C, D, atau E — BUKAN teks opsinya>",
   "topik": ""
 }
 
@@ -6929,7 +6949,7 @@ function SoalForm({
             </p>
           )}
         </div>
-      )}s
+      )}
       {soalTipe === "essay" && (
         <div>
           <label className="text-[11px] font-semibold text-slate-500 mb-1 block">Kunci Jawaban (Opsional)</label>

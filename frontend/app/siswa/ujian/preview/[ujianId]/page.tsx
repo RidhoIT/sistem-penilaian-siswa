@@ -197,6 +197,8 @@ export default function PreviewUjianPage() {
                 {currentSoal.gambarUrl && (
                   <img src={currentSoal.gambarUrl} alt="Gambar soal" className="max-w-sm rounded-xl mb-5 border border-slate-200" />
                 )}
+
+
                 {currentSoal.tipe === "PILIHAN_GANDA" && (
                   <div className="space-y-2.5">
                     {[
@@ -206,7 +208,7 @@ export default function PreviewUjianPage() {
                       { key: "D", val: currentSoal.opsiD },
                       { key: "E", val: currentSoal.opsiE },
                     ].filter((o) => o.val).map((opt) => {
-                      const isBenar = showJawaban && currentSoal.jawabanBenar === opt.key; // ← key bukan val
+                      const isBenar = currentSoal.jawabanBenar?.trim().toUpperCase() === opt.key;
                       return (
                         <div
                           key={opt.key}
@@ -228,18 +230,33 @@ export default function PreviewUjianPage() {
                       );
                     })}
 
-                    {/* Kunci jawaban — hanya 1 blok, hapus yang duplikat */}
-                    {showJawaban && (
-                      <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                        <p className="text-[12px] text-emerald-700 font-semibold">
-                          Kunci Jawaban:{" "}
-                          <span className="font-bold text-emerald-900">
-                            {currentSoal.jawabanBenar || "—"}
-                          </span>
-                        </p>
-                      </div>
-                    )}
+                    {/* Kunci jawaban — selalu tampil di preview guru, tidak perlu toggle */}
+                    {/* <div className={`mt-3 p-3 rounded-xl flex items-center gap-2 ${currentSoal.jawabanBenar
+                        ? "bg-emerald-50 border border-emerald-200"
+                        : "bg-red-50 border border-red-200"
+                      }`}>
+                      <CheckCircle className={`w-4 h-4 flex-shrink-0 ${currentSoal.jawabanBenar ? "text-emerald-500" : "text-red-400"}`} />
+                      <p className={`text-[12px] font-semibold ${currentSoal.jawabanBenar ? "text-emerald-700" : "text-red-600"}`}>
+                        {currentSoal.jawabanBenar
+                          ? <>
+                            Jawaban Benar:{" "}
+                            <span className="font-bold text-emerald-900">
+                              {currentSoal.jawabanBenar.trim().toUpperCase()}
+                            </span>
+                            {" — "}
+                            <span className="font-normal">
+                              {currentSoal.jawabanBenar.trim().toUpperCase() === "A" ? currentSoal.opsiA
+                                : currentSoal.jawabanBenar.trim().toUpperCase() === "B" ? currentSoal.opsiB
+                                  : currentSoal.jawabanBenar.trim().toUpperCase() === "C" ? currentSoal.opsiC
+                                    : currentSoal.jawabanBenar.trim().toUpperCase() === "D" ? currentSoal.opsiD
+                                      : currentSoal.jawabanBenar.trim().toUpperCase() === "E" ? currentSoal.opsiE
+                                        : ""}
+                            </span>
+                          </>
+                          : "⚠️ Kunci jawaban belum diset untuk soal ini"
+                        }
+                      </p>
+                    </div> */}
                   </div>
                 )}
                 {currentSoal.tipe === "ESSAY" && (
