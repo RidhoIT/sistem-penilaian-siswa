@@ -1,7 +1,8 @@
 "use client";
-import Sidebar from "@/components/Sidebar";
+
+import SideBar from "@/components/Sidebar";
 import Header from "@/components/Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   User,
   Mail,
@@ -13,37 +14,21 @@ import {
   CheckCircle2,
   XCircle,
   Camera,
-  Edit3,
 } from "lucide-react";
+import { api, getToken } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 type UserProfile = {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "guru";
+  role: "ADMIN" | "GURU";
   nip?: string | null;
   namaSekolah?: string | null;
-  logoSekolah?: string | null;
   isActive: boolean;
   avatarUrl?: string | null;
   lastLoginAt?: string | null;
   createdAt: string;
-  updatedAt: string;
-};
-
-const demoUser: UserProfile = {
-  id: "550e8400-e29b-41d4-a716-446655440000",
-  name: "Budi Santosa",
-  email: "admin123@gmail.com",
-  role: "admin",
-  nip: "198503152010011012",
-  namaSekolah: "SMK Negeri 1 Pekanbaru",
-  logoSekolah: null,
-  isActive: true,
-  avatarUrl: null,
-  lastLoginAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  createdAt: "2024-01-15T08:00:00.000Z",
-  updatedAt: new Date().toISOString(),
 };
 
 function getInitials(name: string) {
@@ -96,12 +81,45 @@ function InfoRow({ icon, label, value }: InfoRowProps) {
 }
 
 export default function ProfilePage() {
-  const user = demoUser;
+  const router = useRouter();
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = getToken();
+      if (!token) {
+        router.push("/auth/login");
+        return;
+      }
+
+      try {
+        const data = await api.get<UserProfile>("/profil");
+        setUser(data);
+      } catch {
+        router.push("/auth/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-900"></div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
   const roleConfig = {
-    admin: { label: "Administrator", cls: "bg-violet-100 text-violet-700 border-violet-200" },
-    guru:  { label: "Guru",          cls: "bg-sky-100 text-sky-700 border-sky-200" },
+    ADMIN: { label: "Administrator", cls: "bg-violet-100 text-violet-700 border-violet-200" },
+    GURU: { label: "Guru", cls: "bg-sky-100 text-sky-700 border-sky-200" },
   };
   const role = roleConfig[user.role] ?? { label: user.role, cls: "bg-gray-100 text-gray-600 border-gray-200" };
 
@@ -115,11 +133,12 @@ export default function ProfilePage() {
       )}
 
       <div
-        className={`${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-300 fixed md:relative z-50`}
+        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 transition-transform duration-300 fixed md:relative z-50`}
       >
-        <Sidebar role={user.role} />
+        {/* <SideBar role={user.role.toLowerCase()} /> */}
+        <SideBar role={user.role.toLowerCase() as "admin" | "guru"} />
+
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -160,11 +179,10 @@ export default function ProfilePage() {
                     {role.label}
                   </span>
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
-                      user.isActive
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${user.isActive
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : "bg-red-50 text-red-600 border-red-200"
-                    }`}
+                      }`}
                   >
                     {user.isActive ? <CheckCircle2 size={11} /> : <XCircle size={11} />}
                     {user.isActive ? "Aktif" : "Nonaktif"}
@@ -219,15 +237,6 @@ export default function ProfilePage() {
                   value={formatDate(user.createdAt)}
                 />
               </div>
-
-              {/* ── Footer action ── */}
-              {/* <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                <button className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors shadow-sm">
-                  <Edit3 size={14} />
-                  Edit Profil
-                </button>
-              </div> */}
-
             </div>
           </div>
         </div>

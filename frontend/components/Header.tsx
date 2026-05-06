@@ -1,4 +1,3 @@
-// D:\Project\sistem-penilaian-siswa\frontend\components\Header.tsx
 "use client";
 
 import React from "react";
@@ -30,7 +29,7 @@ export default function Header({ title, showHamburger, onHamburgerClick, breadcr
             {breadcrumb}
           </nav>
         ) : (
-          <nav className="flex items-center gap-1.5 text-[13px] font-medium min-w-0">
+          <nav className="flex items-center gap-1.5 text-[13px] font-medium min-w-0 overflow-hidden">
             {title.split(" > ").length > 1 ? (
               <>
                 <span className="text-slate-400">{title.split(" > ")[0]}</span>
@@ -48,25 +47,21 @@ export default function Header({ title, showHamburger, onHamburgerClick, breadcr
           <div className="flex items-center gap-2">
             <button className="h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-1.5 transition-colors">
               <Download className="text-[15px]" />
-              <span className="hidden sm:inline">Export CSV</span>
+              Unduh PDF
             </button>
             <button className="h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-1.5 transition-colors">
               <Printer className="text-[15px]" />
-              <span className="hidden sm:inline">Cetak</span>
+              Cetak
             </button>
           </div>
         )}
-        {/* <button className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors">
-          <Bell className="text-xl text-slate-500" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-zinc-900 rounded-full border-2 border-white" />
+        {/* <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors relative">
+          <Bell className="text-slate-500 text-lg" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
-        <Image
-          src="https://api.dicebear.com/7.x/avataaars/svg?seed=Budi"
-          alt="avatar"
-          width={32}
-          height={32}
-          className="w-8 h-8 rounded-full border border-slate-200 bg-slate-100"
-        /> */}
+        <div className="h-8 w-8 rounded-full bg-zinc-900 flex items-center justify-center text-white text-[10px] font-bold">
+          BS
+        </div> */}
       </div>
     </header>
   );

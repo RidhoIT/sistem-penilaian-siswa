@@ -3,12 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, Mail, Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from "lucide-react";
-
-const USERS = {
-  admin: { email: "admin123@gmail.com", password: "admin123", role: "admin", name: "Budi Santosa" },
-  guru: { email: "guru123@gmail.com", password: "guru123", role: "guru", name: "Budi Santosa" },
-};
+import { GraduationCap, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { api, setToken } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,21 +14,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (email === USERS.admin.email && password === USERS.admin.password) {
+    try {
+      const res = await api.post<{
+        token: string;
+        user: { role: string; name: string; email: string };
+      }>("/auth/login", { email, password });
+
+      setToken(res.token);
+      
+      if (res.user.role === "ADMIN") {
         router.push("/admin/dashboard");
-      } else if (email === USERS.guru.email && password === USERS.guru.password) {
-        router.push("/guru/dashboard");
       } else {
-        setError("Email atau kata sandi salah");
-        setIsLoading(false);
+        router.push("/guru/dashboard");
       }
-    }, 1000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Email atau kata sandi salah");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -43,7 +46,7 @@ export default function LoginPage() {
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
               <GraduationCap className="text-slate-900 text-2xl" />
             </div>
-            <span className="text-2xl font-semibold tracking-tight">ExamHub</span>
+            <span className="text-2xl font-semibold tracking-tight">Sistem Penilaian Siswa</span>
           </div>
 
           <div className="space-y-6 max-w-md">
@@ -108,16 +111,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 space-y-2">
-            <p className="text-[12px] font-semibold text-blue-900">Akun Demo:</p>
-            <p className="text-[11px] text-blue-700">
-              <span className="font-medium">Admin:</span> admin123@gmail.com / admin123
-            </p>
-            <p className="text-[11px] text-blue-700">
-              <span className="font-medium">Guru:</span> guru123@gmail.com / guru123
-            </p>
-          </div>
-
           <form className="space-y-5" onSubmit={handleLogin}>
             {error && (
               <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm">
@@ -141,6 +134,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="email@example.com"
                   className="block w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 rounded-md text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                  required
                 />
               </div>
             </div>
@@ -162,6 +156,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="block w-full pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-md text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                  required
                 />
                 <button
                   type="button"
