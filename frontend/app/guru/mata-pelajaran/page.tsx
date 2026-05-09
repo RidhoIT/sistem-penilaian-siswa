@@ -7243,7 +7243,7 @@
 
 
 "use client";
-
+import { uploadGambarKeCloudinary } from "@/lib/uploadImage";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
@@ -7639,88 +7639,52 @@ Keluarkan HANYA array JSON. Mulai dengan [ dan akhiri dengan ].`;
   }));
 }
 
-// ─── FIX UTAMA: uploadGambarKeCloudinary ─────────────────────────────────────
-// Perbaikan: URL harus menggunakan /api/upload/image (bukan /upload/image)
+
 // export async function uploadGambarKeCloudinary(file: File): Promise<string> {
 //   const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
 
 //   const formData = new FormData();
 //   formData.append("file", file);
 
-//   // ✅ PERBAIKAN: tambahkan /api/ sebelum upload/image
-//   const uploadUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/upload/image`;
+//   // ✅ PERBAIKAN: NEXT_PUBLIC_API_URL sudah = "http://localhost:3001/api"
+//   // Jadi cukup tambahkan /upload/image, BUKAN /api/upload/image
+//   // Karena kalau tambah /api lagi → http://localhost:3001/api/api/upload/image (SALAH)
+//   const uploadUrl = `${process.env.NEXT_PUBLIC_API_URL}/upload/image`;
 
-//   console.log("[Upload] Mengirim gambar ke:", uploadUrl);
+//   console.log("[Upload] URL:", uploadUrl);
+//   // Harusnya mencetak: http://localhost:3001/api/upload/image
 
 //   const res = await fetch(uploadUrl, {
 //     method: "POST",
 //     headers: {
-//       // Jangan set Content-Type manual — browser otomatis set boundary multipart
+//       // ⚠️ JANGAN set Content-Type manual untuk multipart/form-data
+//       // Browser akan otomatis set Content-Type + boundary yang benar
 //       Authorization: `Bearer ${token}`,
 //     },
 //     body: formData,
 //   });
 
 //   if (!res.ok) {
-//     const err = await res.json().catch(() => ({}));
-//     console.error("[Upload] Gagal:", err);
-//     throw new Error(err.message || `Gagal mengupload gambar (status ${res.status})`);
+//     let errMsg = `Gagal mengupload gambar (status ${res.status})`;
+//     try {
+//       const err = await res.json();
+//       errMsg = err.message || errMsg;
+//     } catch (_) {
+//       // res bukan JSON, gunakan pesan default
+//     }
+//     console.error("[Upload] Gagal:", res.status, errMsg);
+//     throw new Error(errMsg);
 //   }
 
 //   const data = await res.json();
-//   console.log("[Upload] Berhasil, URL:", data.url);
 
 //   if (!data.url) {
 //     throw new Error("Response tidak mengandung URL gambar");
 //   }
 
+//   console.log("[Upload] Berhasil:", data.url);
 //   return data.url as string;
 // }
-export async function uploadGambarKeCloudinary(file: File): Promise<string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  // ✅ PERBAIKAN: NEXT_PUBLIC_API_URL sudah = "http://localhost:3001/api"
-  // Jadi cukup tambahkan /upload/image, BUKAN /api/upload/image
-  // Karena kalau tambah /api lagi → http://localhost:3001/api/api/upload/image (SALAH)
-  const uploadUrl = `${process.env.NEXT_PUBLIC_API_URL}/upload/image`;
-
-  console.log("[Upload] URL:", uploadUrl);
-  // Harusnya mencetak: http://localhost:3001/api/upload/image
-
-  const res = await fetch(uploadUrl, {
-    method: "POST",
-    headers: {
-      // ⚠️ JANGAN set Content-Type manual untuk multipart/form-data
-      // Browser akan otomatis set Content-Type + boundary yang benar
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
-
-  if (!res.ok) {
-    let errMsg = `Gagal mengupload gambar (status ${res.status})`;
-    try {
-      const err = await res.json();
-      errMsg = err.message || errMsg;
-    } catch (_) {
-      // res bukan JSON, gunakan pesan default
-    }
-    console.error("[Upload] Gagal:", res.status, errMsg);
-    throw new Error(errMsg);
-  }
-
-  const data = await res.json();
-
-  if (!data.url) {
-    throw new Error("Response tidak mengandung URL gambar");
-  }
-
-  console.log("[Upload] Berhasil:", data.url);
-  return data.url as string;
-}
 
 // ─── Helper: resolve gambar — upload base64 ke Cloudinary jika perlu ─────────
 // Dipanggil sebelum POST soal ke backend.
@@ -7728,7 +7692,7 @@ export async function uploadGambarKeCloudinary(file: File): Promise<string> {
 async function resolveGambarUrl(gambar?: string): Promise<string | null> {
   if (!gambar) return null;
   if (gambar.startsWith("https://")) return gambar;  // sudah URL Cloudinary
-  
+
   if (gambar.startsWith("data:") || gambar.startsWith("blob:")) {
     // Untuk blob URL, fetch dulu jadi File, lalu upload
     if (gambar.startsWith("blob:")) {
@@ -7748,7 +7712,7 @@ async function resolveGambarUrl(gambar?: string): Promise<string | null> {
     // base64 langsung upload
     return await uploadGambarKeCloudinary(gambar);
   }
-  
+
   return null;
 }
 
@@ -7885,8 +7849,8 @@ function ImportSoalModal({
             <div className="flex items-center gap-2 flex-wrap">
               {[
                 { ext: "PDF", color: "bg-red-50 text-red-600 border-red-200", desc: "Teks native (bukan scan)" },
-                { ext: "DOCX", color: "bg-blue-50 text-blue-600 border-blue-200", desc: "Word Document" },
-                { ext: "TXT", color: "bg-slate-50 text-slate-600 border-slate-200", desc: "Plain Text" },
+                // { ext: "DOCX", color: "bg-blue-50 text-blue-600 border-blue-200", desc: "Word Document" },
+                // { ext: "TXT", color: "bg-slate-50 text-slate-600 border-slate-200", desc: "Plain Text" },
               ].map(f => (
                 <span key={f.ext} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${f.color}`}>
                   <FileText className="w-3 h-3" /> {f.ext}
@@ -8769,7 +8733,7 @@ function AddContentModal({
                 </div>
                 <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-2">
                   <FileText className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-[11px] text-blue-700">Di langkah berikutnya, Anda bisa menambahkan soal manual atau import dari file PDF/DOCX/TXT.</p>
+                  <p className="text-[11px] text-blue-700">Di langkah berikutnya, Anda bisa menambahkan soal manual atau import dari file PDF</p>
                 </div>
               </div>
             )}
@@ -8785,7 +8749,7 @@ function AddContentModal({
                   onClick={() => setShowImportModal(true)}
                   className="w-full h-10 border-2 border-violet-200 bg-violet-50 text-violet-700 rounded-xl text-[12px] font-semibold hover:bg-violet-100 flex items-center justify-center gap-2 transition-colors"
                 >
-                  <FileUp className="w-4 h-4" /> Import Soal dari File (PDF / DOCX / TXT)
+                  <FileUp className="w-4 h-4" /> Import Soal dari File (PDF)
                 </button>
 
                 {soalList.length > 0 && (
@@ -9435,6 +9399,40 @@ export default function GuruMataPelajaranPage() {
   //     setError(err instanceof Error ? err.message : "Gagal menyimpan soal");
   //   }
   // }
+  // async function handleUpdateSoal(ujianId: string, soalList: SoalItem[]) {
+  //   if (!selectedSubject) return;
+  //   try {
+  //     const soalIds: string[] = [];
+  //     for (const s of soalList) {
+  //       const isNewSoal = /^\d+$/.test(s.id) || s.id.startsWith("import_");
+  //       if (isNewSoal) {
+  //         const gambarUrl = await resolveGambarUrl(s.gambar); // ← upload jika base64
+  //         const soalRes = await api.post<{ id: string }>(
+  //           `/mata-pelajaran/${selectedSubject.id}/soal`,
+  //           {
+  //             pertanyaan: s.pertanyaan,
+  //             tipe: s.tipe === "pg" ? "PILIHAN_GANDA" : "ESSAY",
+  //             topik: s.topik || null,
+  //             gambarUrl,                    // ← URL Cloudinary atau null
+  //             opsiA: s.opsi[0] || null, opsiB: s.opsi[1] || null,
+  //             opsiC: s.opsi[2] || null, opsiD: s.opsi[3] || null,
+  //             opsiE: s.opsi[4] || null,
+  //             jawabanBenar: s.jawaban || null,
+  //           }
+  //         );
+  //         soalIds.push(soalRes.id);
+  //       } else {
+  //         soalIds.push(s.id); // soal lama, pakai id dari DB langsung
+  //       }
+  //     }
+  //     await api.put(`/ujian/${ujianId}`, { soalIds });
+  //     await fetchUjianByTipe(selectedSubject.id, activeTab); // ← refetch dari DB
+  //     fetchSubjects();
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : "Gagal menyimpan soal");
+  //   }
+  // }
+
   async function handleUpdateSoal(ujianId: string, soalList: SoalItem[]) {
     if (!selectedSubject) return;
     try {
@@ -9442,14 +9440,14 @@ export default function GuruMataPelajaranPage() {
       for (const s of soalList) {
         const isNewSoal = /^\d+$/.test(s.id) || s.id.startsWith("import_");
         if (isNewSoal) {
-          const gambarUrl = await resolveGambarUrl(s.gambar); // ← upload jika base64
+          const gambarUrl = await resolveGambarUrl(s.gambar);
           const soalRes = await api.post<{ id: string }>(
             `/mata-pelajaran/${selectedSubject.id}/soal`,
             {
               pertanyaan: s.pertanyaan,
               tipe: s.tipe === "pg" ? "PILIHAN_GANDA" : "ESSAY",
               topik: s.topik || null,
-              gambarUrl,                    // ← URL Cloudinary atau null
+              gambarUrl,
               opsiA: s.opsi[0] || null, opsiB: s.opsi[1] || null,
               opsiC: s.opsi[2] || null, opsiD: s.opsi[3] || null,
               opsiE: s.opsi[4] || null,
@@ -9458,17 +9456,28 @@ export default function GuruMataPelajaranPage() {
           );
           soalIds.push(soalRes.id);
         } else {
-          soalIds.push(s.id); // soal lama, pakai id dari DB langsung
+          // ✅ PERBAIKAN: soal lama tetap di-update isinya + gambarnya
+          const gambarUrl = await resolveGambarUrl(s.gambar);
+          await api.put(`/soal/${s.id}`, {
+            pertanyaan: s.pertanyaan,
+            tipe: s.tipe === "pg" ? "PILIHAN_GANDA" : "ESSAY",
+            topik: s.topik || null,
+            gambarUrl: gambarUrl ?? (s.gambar?.startsWith("https://") ? s.gambar : null),
+            opsiA: s.opsi[0] || null, opsiB: s.opsi[1] || null,
+            opsiC: s.opsi[2] || null, opsiD: s.opsi[3] || null,
+            opsiE: s.opsi[4] || null,
+            jawabanBenar: s.jawaban || null,
+          });
+          soalIds.push(s.id);
         }
       }
       await api.put(`/ujian/${ujianId}`, { soalIds });
-      await fetchUjianByTipe(selectedSubject.id, activeTab); // ← refetch dari DB
+      await fetchUjianByTipe(selectedSubject.id, activeTab);
       fetchSubjects();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menyimpan soal");
     }
   }
-
   function copyToClipboard(text: string, type: "link" | "token") {
     navigator.clipboard.writeText(text).then(() => {
       if (type === "link") { setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000); }
@@ -10161,6 +10170,8 @@ export default function GuruMataPelajaranPage() {
             </div>
           </div>
         </div>
+
+
       )}
 
       {/* ══ MODAL: Tambah Konten ══ */}
